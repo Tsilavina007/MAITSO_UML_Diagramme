@@ -1,8 +1,17 @@
 # Diagrammes UML de MAITSO Madagascar
 
-Ce repository contient 4 diagrammes UML (PlantUML) qui modélise l'architecture de MAITSO Madagascar.
+Ce repository contient 4 diagrammes UML (PlantUML) qui modélise l'architecture de MAITSO Madagascar. Chacun des diagrammes a un fichier associé qui permet de le modifier et de le générer :
 
-[Reference Guide PlantUML en PDF](/PlantUML_Language_Reference_Guide_fr.pdf)
+
+├── [Diagramme_de_Classes.puml](Diagramme_de_Classes.puml)
+├── [Diagramme_de_Cas_dUtilisation.puml](Diagramme_de_Cas_dUtilisation.puml)
+├── [Diagramme_de_Deploiement.puml](Diagramme_de_Deploiement.puml)
+├── [Diagramme_de_Sequence.puml](Diagramme_de_Sequence.puml)
+
+* [Reference Guide PlantUML en PDF](/PlantUML_Language_Reference_Guide_fr.pdf)
+
+* [Online Server de PlantUML](https://www.plantuml.com/plantuml/uml)
+
 
 ## Diagramme de classes
 
