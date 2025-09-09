@@ -1,0 +1,59 @@
+@startuml Sequence_MAITSO_Auth
+' ==== Style ====
+skinparam backgroundColor #FAFAFA
+skinparam sequence {
+  ArrowColor #1B4F72
+  LifeLineBorderColor #1B4F72
+  LifeLineBackgroundColor #EAF2F8
+  ParticipantBorderColor #1B4F72
+  ParticipantBackgroundColor #EAF2F8
+  BoxBorderColor #2E86C1
+  BoxBackgroundColor #D6EAF8
+  Shadowing true
+}
+
+entity "Capteur IoT" as Sensor
+participant "AWS IoT Core" as IoTCore
+participant "Lambda / Kinesis" as Lambda
+participant "Stockage (RDS / S3 / DynamoDB / Timestream)" as Storage
+participant "Microservice IA (Django)" as IA
+participant "Backend Node.js (API)" as Backend
+participant "AWS Cognito\n(Auth Service)" as Cognito
+participant "Frontend React\n(Tableau de bord)" as Frontend
+actor "Entreprise / Responsable\nEnvironnemental" as Entreprise
+
+== Authentification ==
+Entreprise -> Frontend : Login (email, mot de passe)
+Frontend -> Cognito : Requête d’authentification
+Cognito --> Frontend : Token JWT (access_token)
+Frontend -> Backend : Envoie requêtes API + JWT
+Backend -> Cognito : Vérifie JWT
+Cognito --> Backend : Validation OK
+
+== Collecte IoT ==
+Sensor -> IoTCore : Publie données (MQTT/HTTP)
+IoTCore -> Lambda : Transmet évènement
+Lambda -> Storage : Enregistre données brutes
+Lambda -> IA : Envoie données pour prédiction
+
+== Analyse IA ==
+activate IA
+IA -> Storage : Récupère données contextuelles
+IA -> IA : Exécute modèle ML
+IA --> Lambda : Retour prédiction
+deactivate IA
+
+== Traitement & API ==
+Lambda -> Backend : POST /events (données traitées)
+Backend -> Storage : Lecture/agrégation
+Backend -> Frontend : push via WebSocket/REST (JWT vérifié)
+
+== Visualisation ==
+Frontend -> Entreprise : Affiche tableau de bord + alertes
+Entreprise -> Frontend : Demande export (CSV/PDF)
+Frontend -> Backend : GET /export (JWT)
+Backend -> Storage : Génère rapport
+Backend --> Frontend : Fichier CSV/PDF
+Frontend --> Entreprise : Téléchargement du rapport
+
+@enduml

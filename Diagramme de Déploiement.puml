@@ -1,0 +1,91 @@
+@startuml Deployment_MAITSO_Advanced
+' ==== Style ====
+skinparam backgroundColor #FAFAFA
+skinparam node {
+  BackgroundColor #EAF2F8
+  BorderColor #1B4F72
+}
+skinparam artifact {
+  BackgroundColor #D6EAF8
+  BorderColor #1B4F72
+}
+
+skinparam database {
+  BackgroundColor #FDEDEC
+  BorderColor #922B21
+}
+skinparam component {
+  BackgroundColor #E8F8F5
+  BorderColor #117A65
+}
+skinparam shadowing true
+skinparam roundcorner 20
+
+' ==== IoT Layer ====
+node "Réseau IoT" as IoTNetwork {
+  node "Capteurs (Température, CO₂, Humidité, Énergie)" as Sensors
+  node "Gateway IoT" as Gateway {
+    artifact "MQTT/HTTP Client" as MQTTClient
+  }
+}
+
+' ==== Cloud Layer ====
+  node "IoT Services" as IoTServices {
+    component "AWS IoT Core" as IoTCore
+    component "IoT Device Gateway" as IoTDeviceGateway
+  }
+
+  node "Streaming & Compute" as StreamingCompute {
+    component "AWS Lambda" as Lambda
+    component "Amazon Kinesis" as Kinesis
+  }
+
+  node "Stockage & Bases" as StorageDB {
+    database "Amazon RDS (PostgreSQL)" as RDS
+    database "Amazon Timestream (IoT TS)" as Timestream
+    database "Amazon S3 (Données brutes)" as S3
+	database "Amazon DynamoDB (Données fichiers, ex: Json)" as DynamoDB
+  }
+
+  node "Backend & IA" as BackendIA {
+    component "Backend Node.js (API REST)" as Backend
+    component "Microservice IA (Django + ML)" as DjangoIA
+  }
+
+  node "Authentification & Sécurité" as AuthSecurity {
+    component "AWS Cognito (JWT)" as Cognito
+    component "IAM + TLS" as IAMTLS
+  }
+
+  node "Frontend & Distribution" as FrontendNode {
+    component "React.js\n(AWS Amplify + CloudFront)" as Frontend
+  }
+
+  node "Monitoring" as Monitoring {
+    component "AWS CloudWatch" as CloudWatch
+    component "AWS GuardDuty" as GuardDuty
+  }
+
+
+' ==== Relations ====
+Sensors --> Gateway : Mesures environnementales
+Gateway --> IoTCore : Publie données (MQTT/HTTPS)
+IoTCore --> Lambda : Events IoT
+Lambda --> Kinesis : Flux en temps réel
+Lambda --> S3 : Stockage brut
+Lambda --> DynamoDB : Stockage fichiers
+Lambda --> Timestream : Séries temporelles
+Lambda --> Backend : POST événements
+Lambda --> DjangoIA : Données pour analyse
+
+DjangoIA --> RDS : Enregistrement prédictions
+Backend --> RDS : Lecture/Écriture
+Backend --> Frontend : API REST / WebSocket
+Frontend --> Cognito : Authentification (Login)
+Backend --> Cognito : Vérification JWT
+
+CloudWatch <-- Lambda : Logs
+CloudWatch <-- Backend : Logs
+GuardDuty --> AWSCloud : Sécurité/Alertes
+
+@enduml

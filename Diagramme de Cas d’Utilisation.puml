@@ -1,0 +1,73 @@
+@startuml UseCases_MAITSO_Entreprise
+' ==== Style général ====
+skinparam backgroundColor #FAFAFA
+skinparam actorStyle awesome
+skinparam shadowing true
+skinparam roundcorner 20
+skinparam handwritten false
+skinparam package {
+  BackgroundColor #F0F8FF
+  BorderColor #2E86C1
+}
+skinparam usecase {
+  BackgroundColor #EAF2F8
+  BorderColor #1B4F72
+  ArrowColor #1B4F72
+}
+
+left to right direction
+
+' ==== Acteurs principaux ====
+actor ":office: Entreprise Cliente" as Entreprise
+actor ":chart-line: Responsable Environnemental" as RespEnv
+actor ":shield: Administrateur MAITSO" as Admin
+actor ":satellite: Capteurs IoT" as Capteur
+
+' ==== Système ====
+package "Plateforme MAITSO Madagascar" {
+
+  rectangle "Collecte & Monitoring" {
+    usecase "Collecter données IoT" as UC_Collect
+    usecase "Suivre consommation\n(énergie, eau, déchets)" as UC_Follow
+    usecase "Surveillance qualité\nde l’air" as UC_Air
+    usecase "Recevoir alertes temps réel" as UC_Alert
+  }
+
+  rectangle "Analyse & Prédictions" {
+    usecase "Lancer analyses\nprédictives (IA)" as UC_IA
+    usecase "Rapports environnementaux\nmensuels/annuels" as UC_Report
+  }
+
+  rectangle "Visualisation & Services" {
+    usecase "Accéder au tableau de bord\ninteractif" as UC_Dashboard
+    usecase "Exporter données\n(CSV/PDF)" as UC_Export
+    usecase "Messagerie interne\nEntreprise ↔ MAITSO" as UC_Msg
+  }
+
+  rectangle "Administration" {
+    usecase "Gérer utilisateurs & rôles" as UC_Admin
+    usecase "Configurer seuils et alertes" as UC_Config
+  }
+}
+
+' ==== Associations ====
+Capteur --> UC_Collect
+
+Entreprise --> UC_Dashboard
+Entreprise --> UC_Export
+Entreprise --> UC_Report
+Entreprise --> UC_Msg
+
+RespEnv --> UC_Collect
+RespEnv --> UC_Follow
+RespEnv --> UC_Air
+RespEnv --> UC_Alert
+RespEnv --> UC_IA
+RespEnv --> UC_Report
+RespEnv --> UC_Dashboard
+
+Admin --> UC_Admin
+Admin --> UC_Config
+Admin --> UC_Msg
+
+@enduml

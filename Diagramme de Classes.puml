@@ -1,0 +1,106 @@
+@startuml Classes_MAITSO_Advanced
+' ==== Style global ====
+skinparam backgroundColor #FAFAFA
+skinparam class {
+  BackgroundColor #EAF2F8
+  BorderColor #1B4F72
+  ArrowColor #1B4F72
+}
+skinparam shadowing true
+skinparam roundcorner 20
+skinparam handwritten false
+
+' ==== Packages ====
+package "Gestion Utilisateurs & Communication" {
+  class Utilisateur {
+    +id: UUID
+    +nom: String
+    +email: String
+    +role: Role
+    +authentifier(credentials): Token
+    +consulterDashboard(): DashboardView
+    +envoyerMessage(msg: Message): boolean
+  }
+
+  class Message {
+    +id: UUID
+    +contenu: String
+    +date: DateTime
+    +expediteur: Utilisateur
+    +destinataire: Utilisateur
+    +envoyer(): boolean
+  }
+}
+
+package "Collecte & IoT" {
+  class CapteurIoT {
+    +id: UUID
+    +type: String
+    +localisation: String
+    +statut: String
+    +collecterDonnees(): Donnee
+    +envoyerAuGateway(): boolean
+  }
+
+  class DonneeEnvironnementale {
+    +id: UUID
+    +type: String
+    +valeur: Float
+    +timestamp: DateTime
+    +origine: String
+    +enregistrer(): boolean
+    +filtrer(filtres): Donnee[]
+  }
+
+  class Gateway {
+    +id: UUID
+    +protocol: String
+    +pushToCloud(packet): boolean
+  }
+}
+
+package "Analyse & Services" {
+  class AnalyseIA {
+    +modelName: String
+    +version: String
+    +entrainer(dataset): Model
+    +predire(donnee: Donnee): Prediction
+    +genererRecommandations(prediction): Recommendation[]
+  }
+
+  class Dashboard {
+    +id: UUID
+    +nom: String
+    +widgets: List<Widget>
+    +afficherGraphiques(): void
+    +exporterCSV(range): File
+    +genererPDF(range): File
+  }
+
+  class Rapport {
+    +id: UUID
+    +type: String
+    +periode: DateRange
+    +generer(): File
+  }
+
+  class ModuleFormation {
+    +id: UUID
+    +cours: List<Cours>
+    +quiz: List<Quiz>
+    +suiviProgression(user: Utilisateur): Progress
+  }
+}
+
+' ==== Relations ====
+Utilisateur "1" -- "0..n" Message : envoie/reçoit >
+Utilisateur "1" -- "0..n" Dashboard : consulte >
+Utilisateur "0..n" -- "0..n" Rapport : demande >
+
+CapteurIoT "1" -- "0..n" DonneeEnvironnementale : produit >
+Gateway "1" -- "0..n" CapteurIoT : collecte >
+DonneeEnvironnementale "0..n" -- "1" AnalyseIA : analyse >
+Dashboard "1" ..> AnalyseIA : utilise (prédictions)
+Rapport "1" ..> DonneeEnvironnementale
+
+@enduml
